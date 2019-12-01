@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace EventManager.Controllers
 {
@@ -11,30 +11,23 @@ namespace EventManager.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private ILoggerManager _logger;
 
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILoggerManager logger)
         {
-            _logger = logger;
+            Logger = logger;
         }
 
-        [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public ILoggerManager Logger { get => _logger; set => _logger = value; }
+
+        [HttpGet("/eventmanager")]
+        public IEnumerable<string> Get()
         {
-            var rng = new Random();
-            var rng2 = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            Logger.LogInfo("Here is info message from the controller.");
+            Logger.LogDebug("Here is debug message from the controller.");
+            Logger.LogWarn("Here is warn message from the controller.");
+            Logger.LogError("Here is error message from the controller.");
+            return new string[] { "value1", "value2" };
         }
     }
 }
