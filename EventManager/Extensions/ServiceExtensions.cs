@@ -1,7 +1,11 @@
 ﻿using Contracts;
+using Entities;
 using LoggerService;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pomelo.EntityFrameworkCore.MySql.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +21,8 @@ namespace EventManager.Extensions
             {
                 options.AddPolicy("CORS Policy", 
                     builder => builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyMethod());
+                    .WithMethods("POST", "GET")
+                    .AllowAnyHeader());
             });
         }
 
@@ -31,7 +35,14 @@ namespace EventManager.Extensions
 
         public static void ConfigureLoggerService(this IServiceCollection services)
         {
-            services.AddSingleton<ILoggerManager, LoggerManager>();
+            services.AddScoped<ILoggerManager, LoggerManager>();
+        } 
+
+        public static void ConfigureMySqlContext(this IServiceCollection services, IConfiguration config)
+        {
+            var connectionString = config["mysqlconnection:connectionString"];
+            services.AddDbContextPool<RepositoryContext>(o => o.UseMySql(connectionString, 
+                b => b.MigrationsAssembly("EventManager")));
         }
     }
 }

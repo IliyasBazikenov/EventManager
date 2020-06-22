@@ -29,11 +29,12 @@ namespace EventManager
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public static void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureCors();
             services.ConfigureIISIntegration();
             services.ConfigureLoggerService();
+            services.ConfigureMySqlContext(Configuration);
             services.AddControllers();
             
         }
@@ -56,7 +57,6 @@ namespace EventManager
             });
 
             app.UseHttpsRedirection();
-
 
             app.UseRouting();
 

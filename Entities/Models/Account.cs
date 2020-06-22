@@ -2,24 +2,31 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Dynamic;
 using System.Text;
 
-namespace Models
+namespace Entities.Models
 {
-    public class User
+    public class Account
     {
         [Key]
-        [Required]
+        public Guid AccountId { get; set; }
+
+        [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string Email { get; set; }
 
-        [Required]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$", ErrorMessage = "Invalid password")]
+        [Required(ErrorMessage = "Password is required")]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Phone number is required")]
         [Phone(ErrorMessage = "Invalid phone number")]
         public string PhoneNumber { get; set; }
+
+        [Required(ErrorMessage = "Created date is required")]
+        [DataType(DataType.Date)]
+        public DateTime CreatedDate { get; set; }
 
         [Required]
         [StringLength(50, ErrorMessage = "Firstname length must be between 1 and 50 character", MinimumLength = 1)]
@@ -41,7 +48,13 @@ namespace Models
         [MaxLength(50, ErrorMessage = "City length must be  less than 50 characters")]
         public string City { get; set; }
 
-        [Required]
-        public string Role { get; set; }
+        public int FriendsAmount { get; set; }
+
+        // AccountType can be admin, moderator or default user.  
+        [Required(ErrorMessage = "Account type is required")]
+        public string AccountType { get; set; }
+
+        public ICollection<Event> Events { get; set; }
+        public ICollection<EventParticipant> EventParticipants { get; set; }
     }
 }
