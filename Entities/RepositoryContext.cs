@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Entities.Configuration;
+using Entities.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Entities
         {
             modelBuilder.Entity<AccountFriend>()
                 .HasKey(s => new { s.AccountId, s.FriendId });
+            modelBuilder.ApplyConfiguration(new AccountConfiguration());
         }
 
         public DbSet<Account> Accounts { get; set; }
