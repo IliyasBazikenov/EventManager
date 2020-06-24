@@ -8,6 +8,8 @@ namespace Contracts
     {
         IAccountRepository Account { get; }
         IEventRepository Event { get; }
+        IAccountFriendRepository AccountFriend { get; }
+        IEventParticipantRepository EventParticipant { get; }
         void Save();
     }
 }

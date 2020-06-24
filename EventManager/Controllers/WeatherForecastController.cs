@@ -11,22 +11,16 @@ namespace EventManager.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private ILoggerManager _logger;
+        private readonly IRepositoryManager _repository;
 
-        public WeatherForecastController(ILoggerManager logger)
+        public WeatherForecastController(IRepositoryManager repository)
         {
-            Logger = logger;
+            _repository = repository;
         }
 
-        public ILoggerManager Logger { get => _logger; set => _logger = value; }
-
-        [HttpGet("/eventmanager")]
-        public IEnumerable<string> Get()
+        [HttpGet]
+        public ActionResult<IEnumerable<string>> Get()
         {
-            Logger.LogInfo("Here is info message from the controller.");
-            Logger.LogDebug("Here is debug message from the controller.");
-            Logger.LogWarn("Here is warn message from the controller.");
-            Logger.LogError("Here is error message from the controller.");
             return new string[] { "value1", "value2" };
         }
     }

@@ -45,8 +45,8 @@ namespace Entities.Models
         [MaxLength(50, ErrorMessage = "Country length must be  less than 50 characters")]
         public string Country { get; set; }
 
-        [MaxLength(50, ErrorMessage = "City length must be  less than 50 characters")]
-        public string City { get; set; }
+        [MaxLength(150, ErrorMessage = "Address length must be  less than 150 characters")]
+        public string Address { get; set; }
 
         public int FriendsAmount { get; set; }
 

@@ -3,6 +3,7 @@ using Entities;
 using Entities.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Repository
@@ -12,6 +13,13 @@ namespace Repository
         public AccountRepository(RepositoryContext repositoryContext)
             :base(repositoryContext)
         {
+        }
+
+        public IEnumerable<Account> GetAllAccounts(bool trackChanges)
+        {
+            return FindAll(trackChanges).
+                OrderBy(a => a.FirstName)
+                .ToList();
         }
 
     }

@@ -35,6 +35,7 @@ namespace EventManager
             services.ConfigureIISIntegration();
             services.ConfigureLoggerService();
             services.ConfigureMySqlContext(Configuration);
+            services.ConfigureRepositoryManager();
             services.AddControllers();
             
         }

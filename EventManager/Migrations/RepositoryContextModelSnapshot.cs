@@ -27,12 +27,12 @@ namespace EventManager.Migrations
                         .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<string>("Addresss")
+                        .HasColumnType("varchar(150) CHARACTER SET utf8mb4")
+                        .HasMaxLength(150);
+
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("City")
-                        .HasColumnType("varchar(50) CHARACTER SET utf8mb4")
-                        .HasMaxLength(50);
 
                     b.Property<string>("Country")
                         .HasColumnType("varchar(50) CHARACTER SET utf8mb4")
@@ -73,34 +73,6 @@ namespace EventManager.Migrations
                     b.HasKey("AccountId");
 
                     b.ToTable("Accounts");
-
-                    b.HasData(
-                        new
-                        {
-                            AccountId = new Guid("bd3d0e41-e0a1-4d91-8c58-5e39f01f3d0f"),
-                            AccountType = "admin",
-                            BirthDate = new DateTime(1997, 8, 12, 7, 22, 16, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2020, 6, 23, 15, 7, 10, 531, DateTimeKind.Utc).AddTicks(6792),
-                            Email = "some@gmail.com",
-                            FirstName = "Alexander",
-                            FriendsAmount = 0,
-                            LastName = "Maglev",
-                            Password = "Qazwsxedc1!",
-                            PhoneNumber = "+79999999999"
-                        },
-                        new
-                        {
-                            AccountId = new Guid("2dc36a8a-c0fd-44fd-9781-42a66cd45237"),
-                            AccountType = "admin",
-                            BirthDate = new DateTime(1999, 8, 12, 12, 22, 16, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2020, 6, 23, 15, 7, 10, 531, DateTimeKind.Utc).AddTicks(8872),
-                            Email = "some@mail.com",
-                            FirstName = "Ivan",
-                            FriendsAmount = 0,
-                            LastName = "Maglev",
-                            Password = "Qazwsxedc1!",
-                            PhoneNumber = "+79999999998"
-                        });
                 });
 
             modelBuilder.Entity("Entities.Models.AccountFriend", b =>

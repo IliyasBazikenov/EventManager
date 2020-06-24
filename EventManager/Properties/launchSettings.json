@@ -19,7 +19,7 @@
     },
     "EventManager": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "eventmanager",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {

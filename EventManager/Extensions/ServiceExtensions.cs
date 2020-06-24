@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pomelo.EntityFrameworkCore.MySql.Storage;
+using Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,11 @@ namespace EventManager.Extensions
             var connectionString = config["mysqlconnection:connectionString"];
             services.AddDbContextPool<RepositoryContext>(o => o.UseMySql(connectionString, 
                 b => b.MigrationsAssembly("EventManager")));
+        }
+
+        public static void ConfigureRepositoryManager(this IServiceCollection services)
+        {
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
         }
     }
 }
