@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
 using Microsoft.AspNetCore.Http;
@@ -15,10 +16,12 @@ namespace EventManager.Controllers
     {
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
-        public AccountsController(IRepositoryManager repository, ILoggerManager logger)
+        private readonly IMapper _mapper;
+        public AccountsController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -27,17 +30,7 @@ namespace EventManager.Controllers
             try
             {
                 var accounts = _repository.Account.GetAllAccounts(trackChanges: false);
-                var accountsDTO = accounts.Select(a => new AccountDTO
-                {
-                    AccountId = a.AccountId,
-                    FirstName = a.FirstName,
-                    SecondName = a.SecondName,
-                    Email = a.Email,
-                    Address = a.Address,
-                    LastName = a.LastName,
-                    BirthDate = a.BirthDate,
-                    PhoneNumber = a.PhoneNumber
-                });
+                var accountsDTO = _mapper.Map<IEnumerable<AccountDTO>>(accounts);
 
                 return Ok(accountsDTO);
             }
