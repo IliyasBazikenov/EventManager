@@ -238,3 +238,6 @@ Migrations/
 
 # appsettings
 appsettings.*
+
+# logfiles
+Logs/

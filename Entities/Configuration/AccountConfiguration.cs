@@ -11,6 +11,9 @@ namespace Entities.Configuration
     {
         public void Configure(EntityTypeBuilder<Account> builder)
         {
+            builder.HasIndex(a => a.Email)
+                .IsUnique();
+
             builder.HasData
                 (
                     new Account
@@ -28,7 +31,7 @@ namespace Entities.Configuration
 
                     new Account
                     {
-                        AccountId = Guid.NewGuid(),
+                        AccountId = Guid.Parse("e5dbaaab-1c30-47cd-931d-e2cf9efe20b1"),
                         FirstName = "Ivan",
                         LastName = "Maglev",
                         AccountType = "admin",

@@ -13,6 +13,9 @@ namespace EventManager
         public MappingProfile()
         {
             CreateMap<Account, AccountDTO>();
+            CreateMap<AccountForCreationDTO, Account>();
+            CreateMap<Event, EventDTO>();
+            CreateMap<EventForCreationDTO, Event>();
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Entities.Models
         [Key]
         public Guid AccountId { get; set; }
 
+        
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string Email { get; set; }

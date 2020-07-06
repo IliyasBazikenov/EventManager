@@ -24,11 +24,10 @@ namespace Entities.Models
         [DataType(DataType.Date)]
         public DateTime DateOfEvent { get; set; }
         public string EventInfo { get; set; }
-
         public int ParticipantAmount { get; set; }
 
         [ForeignKey(nameof(Account))]
-        public Guid AccountID { get; set; }
+        public Guid AccountId { get; set; }
         public Account Account { get; set; }
 
         public ICollection<EventParticipant> EventParticipants { get; set; }

@@ -18,7 +18,9 @@ namespace Entities
         {
             modelBuilder.Entity<AccountFriend>()
                 .HasKey(s => new { s.AccountId, s.FriendId });
+
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
+            modelBuilder.ApplyConfiguration(new EventConfiguration());
         }
 
         public DbSet<Account> Accounts { get; set; }
