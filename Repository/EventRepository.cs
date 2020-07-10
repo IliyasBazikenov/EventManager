@@ -33,5 +33,10 @@ namespace Repository
             eventEntity.AccountId = accountId;
             Create(eventEntity);
         }
+
+        public void DeleteEvent(Event eventEntity)
+        {
+            Delete(eventEntity);
+        }
     }
 }

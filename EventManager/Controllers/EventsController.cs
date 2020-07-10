@@ -31,7 +31,7 @@ namespace EventManager.Controllers
             var account = _repository.Account.GetAccount(accountId, trackChanges: false);
             if (account == null)
             {
-                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse");
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
                 return NotFound();
             }
             var accountEvents = _repository.Event.GetEvents(accountId, trackChanges: false);
@@ -45,34 +45,56 @@ namespace EventManager.Controllers
             var account = _repository.Account.GetAccount(accountId, trackChanges: false);
             if (account == null)
             {
-                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse");
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
                 return NotFound();
             }
 
             var accountEvent = _repository.Event.GetEvent(accountId, eventId, trackChanges: false);
             if (accountEvent == null)
             {
-                _logger.LogInfo($"Event with id: {eventId} doesn't exist in the databse");
+                _logger.LogInfo($"Event with id: {eventId} doesn't exist in the databse.");
                 return NotFound();
             }
             var accountDTO = _mapper.Map<EventDTO>(accountEvent);
             return Ok(accountDTO);
         }
 
-        [HttpPost]
-        public IActionResult CreateEvent(Guid accountId, [FromBody]EventForCreationDTO eventDTO)
+        [HttpDelete("{eventId}")]
+        public IActionResult DeleteEvent(Guid accountId, int eventId)
         {
             var account = _repository.Account.GetAccount(accountId, trackChanges: false);
             if (account == null)
             {
-                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse");
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
                 return NotFound();
             }
 
+            var accountEvent = _repository.Event.GetEvent(accountId, eventId, trackChanges: false);
+            if (accountEvent == null)
+            {
+                _logger.LogInfo($"Event with id: {eventId} doesn't exist in the databse.");
+                return NotFound();
+            }
+            _repository.Event.DeleteEvent(accountEvent);
+            _repository.Save();
+
+            return NoContent();
+        }
+
+        [HttpPost]
+        public IActionResult CreateEvent(Guid accountId, [FromBody] EventForCreationDTO eventDTO)
+        {
             if (eventDTO == null)
             {
-                _logger.LogInfo($"EventDTO sent from client is not valid");
-                return BadRequest("EventDTO is not valid");
+                _logger.LogInfo($"EventDTO sent from client is null.");
+                return BadRequest("EventDTO is null");
+            }
+
+            var account = _repository.Account.GetAccount(accountId, trackChanges: false);
+            if (account == null)
+            {
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
+                return NotFound();
             }
 
             var eventEntity = _mapper.Map<Event>(eventDTO);
@@ -81,7 +103,35 @@ namespace EventManager.Controllers
 
             var eventToReturn = _mapper.Map<EventDTO>(eventEntity);
 
-            return CreatedAtRoute("GetEventForAccount", new { accountId = accountId, eventId = eventToReturn.EventId}, eventToReturn);
+            return CreatedAtRoute("GetEventForAccount", new { accountId = accountId, eventId = eventToReturn.EventId }, eventToReturn);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateEventForAccount(Guid accountId, int eventId, [FromBody] EventForUpdateDTO eventDTO)
+        {
+            if (eventDTO == null)
+            {
+                _logger.LogError($"EventForUpdateDTO object sent from client is null.");
+                return BadRequest("ventForUpdateDTO object is null");
+            }
+
+            var account = _repository.Account.GetAccount(accountId, trackChanges: false);
+            if (account == null)
+            {
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
+                return NotFound();
+            }
+
+            var eventEntity = _repository.Event.GetEvent(accountId, eventId, trackChanges: true);
+            if(eventEntity == null)
+            {
+                _logger.LogInfo($"Event with id: {eventId} doesn't exist in the database.");
+                return NotFound();
+            }
+
+            _mapper.Map(eventDTO, eventEntity);
+            _repository.Save();
+            return NoContent();
         }
     }
 }

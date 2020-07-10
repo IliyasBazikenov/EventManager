@@ -11,5 +11,6 @@ namespace Contracts
         Account GetAccount(Guid accountId, bool trackChanges);
         void CreateAccount(Account account);
         IEnumerable<Account> GetByIds(IEnumerable<Guid> accountIds, bool trackChanges);
+        void DeleteAccount(Account account);
     }
 }

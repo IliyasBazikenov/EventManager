@@ -38,5 +38,10 @@ namespace Repository
             return FindByCondition(a => accountIds.Contains(a.AccountId), trackChanges)
                 .ToList();
         }
+
+        public void DeleteAccount(Account account)
+        {
+            Delete(account);
+        }
     }
 }

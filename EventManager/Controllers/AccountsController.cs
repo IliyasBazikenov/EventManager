@@ -41,7 +41,7 @@ namespace EventManager.Controllers
             var account = _repository.Account.GetAccount(accountId, trackChanges: false);
             if (account == null)
             {
-                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse");
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
                 return NotFound();
             }
             else
@@ -52,11 +52,11 @@ namespace EventManager.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] AccountForCreationDTO account)
+        public IActionResult CreateAccount([FromBody] AccountForCreationDTO account)
         {
             if (account == null)
             {
-                _logger.LogError("AccountForCreationDTO object sent from client is null");
+                _logger.LogError("AccountForCreationDTO object sent from client is null.");
                 return BadRequest("Account object is null");
             }
 
@@ -70,20 +70,20 @@ namespace EventManager.Controllers
         }
 
         [HttpGet("collection/({accountIds})", Name = "AccountCollection")]
-        public IActionResult GetAccountCollection([ModelBinder(BinderType = 
+        public IActionResult GetAccountCollection([ModelBinder(BinderType =
             typeof(ArrayModelBinder))]IEnumerable<Guid> accountIds)
         {
             if (accountIds == null)
             {
-                _logger.LogError("AccountId collection from the client is null");
-                return BadRequest("AccountId collection from the client is null");
+                _logger.LogError("Parameter accountId from the client is null.");
+                return BadRequest("Parameter accountId is null");
             }
 
             var accounts = _repository.Account.GetByIds(accountIds, trackChanges: false);
 
             if (accountIds.Count() != accounts.Count())
             {
-                _logger.LogError("Some accountIds ids are not valid in a collection!");
+                _logger.LogError("Some accountIds ids are not valid in a collection.");
                 return NotFound();
             }
 
@@ -97,7 +97,7 @@ namespace EventManager.Controllers
         {
             if (accountForCreationDTOs == null)
             {
-                _logger.LogError("Account collection sent from client is null");
+                _logger.LogError("Account collection sent from client is null.");
                 return BadRequest("Account collection is null");
             }
 
@@ -113,6 +113,22 @@ namespace EventManager.Controllers
             var accountIds = string.Join(",", accountDTOs.Select(a => a.AccountId));
 
             return CreatedAtRoute("AccountCollection", new { accountIds }, accountDTOs);
+        }
+
+        [HttpDelete("{accountId}")]
+        public IActionResult DeleteAccount(Guid accountId)
+        {
+            var account = _repository.Account.GetAccount(accountId, trackChanges: false);
+            if (account == null)
+            {
+                _logger.LogInfo("Account object sent from client is null.");
+                return NotFound();
+            }
+
+            _repository.Account.DeleteAccount(account);
+            _repository.Save();
+
+            return NoContent();
         }
 
     }

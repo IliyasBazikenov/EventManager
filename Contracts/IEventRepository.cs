@@ -10,5 +10,6 @@ namespace Contracts
         IEnumerable<Event> GetEvents(Guid accountId, bool trackChanges);
         Event GetEvent(Guid accountId, int eventId,bool trackChanges);
         void CreateEvent(Guid accountId, Event eventEntity);
+        void DeleteEvent(Event eventEntity);
     }
 }
