@@ -6,7 +6,6 @@ namespace Entities.DataTransferObjects
 {
     public class EventForUpdateDTO
     {
-        public int EventId { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public string EventName { get; set; }
         public DateTime DateOfEvent { get; set; }

@@ -16,7 +16,8 @@ namespace EventManager
             CreateMap<AccountForCreationDTO, Account>();
             CreateMap<Event, EventDTO>();
             CreateMap<EventForCreationDTO, Event>();
-            CreateMap<EventForUpdateDTO, Event>();
+            CreateMap<EventForUpdateDTO, Event>().ReverseMap();
+            CreateMap<AccountForUpdateDTO, Account>();
         }
     }
 }

@@ -131,5 +131,21 @@ namespace EventManager.Controllers
             return NoContent();
         }
 
+        [HttpPut("{accountId}")]
+        public IActionResult UpdateAccount(Guid accountId, [FromBody]AccountForUpdateDTO account)
+        {
+            if(account == null)
+            {
+                _logger.LogError("Account object sent from client is null.");
+                return BadRequest("Account object is null");
+            }
+
+            var accountEntity = _repository.Account.GetAccount(accountId, true);
+            _mapper.Map(account, accountEntity);
+            _repository.Save();
+
+            return NoContent();
+        }
+
     }
 }

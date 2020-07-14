@@ -7,6 +7,7 @@ using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventManager.Controllers
@@ -103,10 +104,10 @@ namespace EventManager.Controllers
 
             var eventToReturn = _mapper.Map<EventDTO>(eventEntity);
 
-            return CreatedAtRoute("GetEventForAccount", new { accountId = accountId, eventId = eventToReturn.EventId }, eventToReturn);
+            return CreatedAtRoute("GetEventForAccount", new { accountId, eventId = eventToReturn.EventId }, eventToReturn);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{eventId}")]
         public IActionResult UpdateEventForAccount(Guid accountId, int eventId, [FromBody] EventForUpdateDTO eventDTO)
         {
             if (eventDTO == null)
@@ -123,7 +124,7 @@ namespace EventManager.Controllers
             }
 
             var eventEntity = _repository.Event.GetEvent(accountId, eventId, trackChanges: true);
-            if(eventEntity == null)
+            if (eventEntity == null)
             {
                 _logger.LogInfo($"Event with id: {eventId} doesn't exist in the database.");
                 return NotFound();
@@ -131,6 +132,38 @@ namespace EventManager.Controllers
 
             _mapper.Map(eventDTO, eventEntity);
             _repository.Save();
+            return NoContent();
+        }
+
+        [HttpPatch("{eventId}")]
+        public IActionResult PartiallyUpdateEvent(Guid accountId, int eventId,
+            [FromBody]JsonPatchDocument<EventForUpdateDTO> patchDocument)
+        {
+            if(patchDocument == null)
+            {
+                _logger.LogError("patchDocument object sent from client is null.");
+                return BadRequest("patchDocument object is null");
+            }
+
+            var account = _repository.Account.GetAccount(accountId, false);
+            if(account == null)
+            {
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the database.");
+                return NoContent();
+            }
+
+            var eventEntity = _repository.Event.GetEvent(accountId, eventId, true);
+            if(eventEntity == null)
+            {
+                _logger.LogInfo($"Employee with id: {eventId} doesn't exist in the database.");
+            }
+
+            var eventToPatch = _mapper.Map<EventForUpdateDTO>(eventEntity);
+            patchDocument.ApplyTo(eventToPatch);
+
+            _mapper.Map(eventToPatch, eventEntity);
+            _repository.Save();
+
             return NoContent();
         }
     }

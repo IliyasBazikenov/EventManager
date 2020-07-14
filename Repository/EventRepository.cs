@@ -17,8 +17,9 @@ namespace Repository
 
         public Event GetEvent(Guid accountId, int eventId, bool trackChanges)
         {
-            return FindByCondition(e => e.AccountId.Equals(accountId) && e.EventId.Equals(eventId), trackChanges)
-                .SingleOrDefault();
+            var value = FindByCondition(e => e.AccountId.Equals(accountId) && e.EventId.Equals(eventId), trackChanges);
+            return value.SingleOrDefault();
+
         }
 
         public IEnumerable<Event> GetEvents(Guid accountId, bool trackChanges)
