@@ -2,15 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Contracts
 {
     public interface IAccountRepository
     {
-        IEnumerable<Account> GetAllAccounts(bool trackChanges);
-        Account GetAccount(Guid accountId, bool trackChanges);
+        Task<IEnumerable<Account>> GetAllAccountsAsync(bool trackChanges);
+        Task<Account> GetAccountAsync(Guid accountId, bool trackChanges);
         void CreateAccount(Account account);
-        IEnumerable<Account> GetByIds(IEnumerable<Guid> accountIds, bool trackChanges);
+        Task<IEnumerable<Account>> GetByIdsAsync(IEnumerable<Guid> accountIds, bool trackChanges);
         void DeleteAccount(Account account);
     }
 }

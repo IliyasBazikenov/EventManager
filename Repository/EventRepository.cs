@@ -1,10 +1,12 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Repository
 {
@@ -15,18 +17,18 @@ namespace Repository
         {
         }
 
-        public Event GetEvent(Guid accountId, int eventId, bool trackChanges)
+        public async Task<Event> GetEventAsync(Guid accountId, int eventId, bool trackChanges)
         {
-            var value = FindByCondition(e => e.AccountId.Equals(accountId) && e.EventId.Equals(eventId), trackChanges);
-            return value.SingleOrDefault();
+            return await FindByCondition(e => e.AccountId.Equals(accountId) && e.EventId.Equals(eventId), trackChanges)
+                .SingleOrDefaultAsync();
 
         }
 
-        public IEnumerable<Event> GetEvents(Guid accountId, bool trackChanges)
+        public async Task<IEnumerable<Event>> GetEventsAsync(Guid accountId, bool trackChanges)
         {
-            return FindByCondition(e => e.AccountId.Equals(accountId), trackChanges)
+            return await FindByCondition(e => e.AccountId.Equals(accountId), trackChanges)
                 .OrderBy(e => e.EventId)
-                .ToList();
+                .ToListAsync();
         }
 
         public void CreateEvent(Guid accountId, Event eventEntity)

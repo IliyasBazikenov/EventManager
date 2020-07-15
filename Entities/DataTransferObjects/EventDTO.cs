@@ -12,6 +12,5 @@ namespace Entities.DataTransferObjects
         public DateTime DateOfEvent { get; set; }
         public string EventInfo { get; set; }
         public int ParticipantAmount { get; set; }
-        public Guid AccountId { get; set; }
     }
 }

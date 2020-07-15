@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Contracts
 {
     public interface IEventRepository
     {
-        IEnumerable<Event> GetEvents(Guid accountId, bool trackChanges);
-        Event GetEvent(Guid accountId, int eventId,bool trackChanges);
+        Task<IEnumerable<Event>> GetEventsAsync(Guid accountId, bool trackChanges);
+        Task<Event> GetEventAsync(Guid accountId, int eventId,bool trackChanges);
         void CreateEvent(Guid accountId, Event eventEntity);
         void DeleteEvent(Event eventEntity);
     }

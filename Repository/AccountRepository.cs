@@ -1,10 +1,12 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Repository
 {
@@ -15,17 +17,17 @@ namespace Repository
         {
         }
 
-        public IEnumerable<Account> GetAllAccounts(bool trackChanges)
+        public async Task<IEnumerable<Account>> GetAllAccountsAsync(bool trackChanges)
         {
-            return FindAll(trackChanges)
+            return await FindAll(trackChanges)
                 .OrderBy(a => a.FirstName)
-                .ToList();
+                .ToListAsync();
         }
 
-        public Account GetAccount(Guid accountId, bool trackChanges)
+        public async Task<Account> GetAccountAsync(Guid accountId, bool trackChanges)
         {
-            return FindByCondition(a => a.AccountId.Equals(accountId), trackChanges)
-                .SingleOrDefault();
+            return await FindByCondition(a => a.AccountId.Equals(accountId), trackChanges)
+                .SingleOrDefaultAsync();
         }
 
         public void CreateAccount(Account account)
@@ -33,10 +35,10 @@ namespace Repository
             Create(account);
         }
 
-        public IEnumerable<Account> GetByIds(IEnumerable<Guid> accountIds, bool trackChanges)
+        public async Task<IEnumerable<Account>> GetByIdsAsync(IEnumerable<Guid> accountIds, bool trackChanges)
         {
-            return FindByCondition(a => accountIds.Contains(a.AccountId), trackChanges)
-                .ToList();
+            return await FindByCondition(a => accountIds.Contains(a.AccountId), trackChanges)
+                .ToListAsync();
         }
 
         public void DeleteAccount(Account account)

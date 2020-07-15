@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 
-namespace Entities.Models
+namespace Entities.DataTransferObjects
 {
-    public class Event
+    public abstract class EventForManipulationDTO
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int EventId { get; set; }
-
         [Required(ErrorMessage = "Created date is required")]
         [DataType(DataType.Date)]
         public DateTime CreatedDate { get; set; }
@@ -24,11 +20,5 @@ namespace Entities.Models
         public DateTime DateOfEvent { get; set; }
         public string EventInfo { get; set; }
         public int ParticipantAmount { get; set; }
-
-        [ForeignKey(nameof(Account))]
-        public Guid AccountId { get; set; }
-        public Account Account { get; set; }
-
-        public ICollection<EventParticipant> EventParticipants { get; set; }
     }
 }

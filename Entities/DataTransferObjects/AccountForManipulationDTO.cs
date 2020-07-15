@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 
-namespace Entities.Models
+namespace Entities.DataTransferObjects
 {
-    public class Account
+    public abstract class AccountForManipulationDTO
     {
-        [Key]
-        public Guid AccountId { get; set; }
-        
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string Email { get; set; }
@@ -23,7 +21,7 @@ namespace Entities.Models
 
         [Required(ErrorMessage = "Created date is required")]
         [DataType(DataType.Date)]
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [Required]
         [StringLength(50, ErrorMessage = "Firstname length must be between 1 and 50 character", MinimumLength = 1)]
@@ -47,11 +45,10 @@ namespace Entities.Models
 
         public int FriendsAmount { get; set; }
 
-        // AccountType can be admin, moderator or default user.  
         [Required(ErrorMessage = "Account type is required")]
         public string AccountType { get; set; }
 
-        public ICollection<Event> Events { get; set; }
-        public ICollection<EventParticipant> EventParticipants { get; set; }
+        public IEnumerable<EventForCreationDTO> Events { get; set; }
+
     }
 }

@@ -8,6 +8,7 @@ using Entities.DataTransferObjects;
 using Entities.Models;
 using EventManager.ModelBinders;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventManager.Controllers
@@ -27,18 +28,18 @@ namespace EventManager.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAccounts()
+        public async  Task<IActionResult> GetAccounts()
         {
-            var accounts = _repository.Account.GetAllAccounts(trackChanges: false);
+            var accounts = await _repository.Account.GetAllAccountsAsync(trackChanges: false);
             var accountsDTO = _mapper.Map<IEnumerable<AccountDTO>>(accounts);
 
             return Ok(accountsDTO);
         }
 
         [HttpGet("{accountId}", Name = "AccountById")]
-        public IActionResult GetAccount(Guid accountId)
+        public async Task<IActionResult> GetAccount(Guid accountId)
         {
-            var account = _repository.Account.GetAccount(accountId, trackChanges: false);
+            var account = await _repository.Account.GetAccountAsync(accountId, trackChanges: false);
             if (account == null)
             {
                 _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
@@ -52,7 +53,7 @@ namespace EventManager.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateAccount([FromBody] AccountForCreationDTO account)
+        public async Task<IActionResult> CreateAccount([FromBody] AccountForCreationDTO account)
         {
             if (account == null)
             {
@@ -60,9 +61,15 @@ namespace EventManager.Controllers
                 return BadRequest("Account object is null");
             }
 
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the AccountForCreationDTO.");
+                return UnprocessableEntity(ModelState);
+            }
+
             var accountEntity = _mapper.Map<Account>(account);
             _repository.Account.CreateAccount(accountEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
 
             var accountToReturn = _mapper.Map<AccountDTO>(accountEntity);
 
@@ -70,7 +77,7 @@ namespace EventManager.Controllers
         }
 
         [HttpGet("collection/({accountIds})", Name = "AccountCollection")]
-        public IActionResult GetAccountCollection([ModelBinder(BinderType =
+        public async Task<IActionResult> GetAccountCollection([ModelBinder(BinderType =
             typeof(ArrayModelBinder))]IEnumerable<Guid> accountIds)
         {
             if (accountIds == null)
@@ -79,7 +86,7 @@ namespace EventManager.Controllers
                 return BadRequest("Parameter accountId is null");
             }
 
-            var accounts = _repository.Account.GetByIds(accountIds, trackChanges: false);
+            var accounts = await _repository.Account.GetByIdsAsync(accountIds, trackChanges: false);
 
             if (accountIds.Count() != accounts.Count())
             {
@@ -93,12 +100,18 @@ namespace EventManager.Controllers
         }
 
         [HttpPost("collection")]
-        public IActionResult CreateAccountCollection([FromBody] IEnumerable<AccountForCreationDTO> accountForCreationDTOs)
+        public async Task<IActionResult> CreateAccountCollection([FromBody] IEnumerable<AccountForCreationDTO> accountForCreationDTOs)
         {
             if (accountForCreationDTOs == null)
             {
                 _logger.LogError("Account collection sent from client is null.");
                 return BadRequest("Account collection is null");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the AccountForCreationDTO.");
+                return UnprocessableEntity(ModelState);
             }
 
             var accounts = _mapper.Map<IEnumerable<Account>>(accountForCreationDTOs);
@@ -107,7 +120,7 @@ namespace EventManager.Controllers
             {
                 _repository.Account.CreateAccount(account);
             }
-            _repository.Save();
+            await _repository.SaveAsync();
 
             var accountDTOs = _mapper.Map<IEnumerable<AccountDTO>>(accounts);
             var accountIds = string.Join(",", accountDTOs.Select(a => a.AccountId));
@@ -116,23 +129,23 @@ namespace EventManager.Controllers
         }
 
         [HttpDelete("{accountId}")]
-        public IActionResult DeleteAccount(Guid accountId)
+        public async Task<IActionResult> DeleteAccount(Guid accountId)
         {
-            var account = _repository.Account.GetAccount(accountId, trackChanges: false);
+            var account = await _repository.Account.GetAccountAsync(accountId, trackChanges: false);
             if (account == null)
             {
-                _logger.LogInfo("Account object sent from client is null.");
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
                 return NotFound();
             }
 
             _repository.Account.DeleteAccount(account);
-            _repository.Save();
+            await _repository.SaveAsync();
 
             return NoContent();
         }
 
         [HttpPut("{accountId}")]
-        public IActionResult UpdateAccount(Guid accountId, [FromBody]AccountForUpdateDTO account)
+        public async Task<IActionResult> UpdateAccount(Guid accountId, [FromBody]AccountForUpdateDTO account)
         {
             if(account == null)
             {
@@ -140,9 +153,53 @@ namespace EventManager.Controllers
                 return BadRequest("Account object is null");
             }
 
-            var accountEntity = _repository.Account.GetAccount(accountId, true);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the AccountForUpdateDTO.");
+                return UnprocessableEntity(ModelState);
+            }
+
+            var accountEntity = await _repository.Account.GetAccountAsync(accountId, true);
+            if(accountEntity == null)
+            {
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
+                return NotFound();
+            }
+
             _mapper.Map(account, accountEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
+
+            return NoContent();
+        }
+
+        [HttpPatch("{accountId}")]
+        public async Task<IActionResult> PartiallyUpdateAccount(Guid accountId, 
+            [FromBody]JsonPatchDocument<AccountForUpdateDTO> patchDocument)
+        {
+            if(patchDocument == null)
+            {
+                _logger.LogError($"Account patchDocument object sent from client is null.");
+                return BadRequest("PatchDocument is null");
+            }
+
+            var account = await _repository.Account.GetAccountAsync(accountId, true);
+            if(account == null)
+            {
+                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
+                return NotFound();
+            }
+
+            var accountToPatch = _mapper.Map<AccountForUpdateDTO>(account);
+
+            TryValidateModel(accountToPatch);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogInfo("Invalid model state for the AccountForUpdateDTO");
+                return UnprocessableEntity();
+            }
+
+            _mapper.Map(accountToPatch, account);
+            await _repository.SaveAsync();
 
             return NoContent();
         }
