@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,8 +9,8 @@ namespace Contracts
 {
     public interface IEventRepository
     {
-        Task<IEnumerable<Event>> GetEventsAsync(Guid accountId, bool trackChanges);
-        Task<Event> GetEventAsync(Guid accountId, int eventId,bool trackChanges);
+        Task<PagedList<Event>> GetEventsAsync(Guid accountId, EventParameters eventParameters, bool trackChanges);
+        Task<Event> GetEventAsync(Guid accountId, int eventId, bool trackChanges);
         void CreateEvent(Guid accountId, Event eventEntity);
         void DeleteEvent(Event eventEntity);
     }

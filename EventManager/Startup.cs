@@ -2,9 +2,11 @@ using System;
 using System.IO;
 using AutoMapper;
 using Contracts;
+using EventManager.ActionFilters;
 using EventManager.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -37,30 +39,26 @@ namespace EventManager
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
+            services.ConfigureActionFilter();
             services.AddAutoMapper(typeof(Startup));
-            services.AddControllers(config =>
-            {
-                config.RespectBrowserAcceptHeader = true;
-                config.ReturnHttpNotAcceptable = true;
-            }).AddNewtonsoftJson()
-            .AddXmlDataContractSerializerFormatters()
-            .AddCustomCSVFormatter();
-
+            services.ConfigureContentNegotiations();
+                    
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerManager logger)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.ConfigureCustomExceptionMiddleware();
 
             app.UseStaticFiles();
 
-            app.UseCors();
+            app.UseCors("CORS Policy");
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {

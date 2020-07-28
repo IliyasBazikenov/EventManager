@@ -6,10 +6,12 @@ using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using EventManager.ActionFilters;
 using EventManager.ModelBinders;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace EventManager.Controllers
 {
@@ -28,7 +30,7 @@ namespace EventManager.Controllers
         }
 
         [HttpGet]
-        public async  Task<IActionResult> GetAccounts()
+        public async Task<IActionResult> GetAccounts()
         {
             var accounts = await _repository.Account.GetAllAccountsAsync(trackChanges: false);
             var accountsDTO = _mapper.Map<IEnumerable<AccountDTO>>(accounts);
@@ -37,43 +39,13 @@ namespace EventManager.Controllers
         }
 
         [HttpGet("{accountId}", Name = "AccountById")]
-        public async Task<IActionResult> GetAccount(Guid accountId)
+        [ServiceFilter(typeof(ValidateAccountExistsAttribute))]
+        public IActionResult GetAccount(Guid accountId)
         {
-            var account = await _repository.Account.GetAccountAsync(accountId, trackChanges: false);
-            if (account == null)
-            {
-                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
-                return NotFound();
-            }
-            else
-            {
-                var accountDTO = _mapper.Map<AccountDTO>(account);
-                return Ok(accountDTO);
-            }
-        }
+            var account = HttpContext.Items["account"];
 
-        [HttpPost]
-        public async Task<IActionResult> CreateAccount([FromBody] AccountForCreationDTO account)
-        {
-            if (account == null)
-            {
-                _logger.LogError("AccountForCreationDTO object sent from client is null.");
-                return BadRequest("Account object is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the AccountForCreationDTO.");
-                return UnprocessableEntity(ModelState);
-            }
-
-            var accountEntity = _mapper.Map<Account>(account);
-            _repository.Account.CreateAccount(accountEntity);
-            await _repository.SaveAsync();
-
-            var accountToReturn = _mapper.Map<AccountDTO>(accountEntity);
-
-            return CreatedAtRoute("AccountById", new { accountId = accountToReturn.AccountId }, accountToReturn);
+            var accountDTO = _mapper.Map<AccountDTO>(account);
+            return Ok(accountDTO);
         }
 
         [HttpGet("collection/({accountIds})", Name = "AccountCollection")]
@@ -90,7 +62,7 @@ namespace EventManager.Controllers
 
             if (accountIds.Count() != accounts.Count())
             {
-                _logger.LogError("Some accountIds ids are not valid in a collection.");
+                _logger.LogError("Some accountIds are not valid in a collection.");
                 return NotFound();
             }
 
@@ -99,21 +71,24 @@ namespace EventManager.Controllers
             return Ok(accountsDTO);
         }
 
+        [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> CreateAccount([FromBody] AccountForCreationDTO account)
+        {
+            var accountEntity = _mapper.Map<Account>(account);
+
+            _repository.Account.CreateAccount(accountEntity);
+            await _repository.SaveAsync();
+
+            var accountToReturn = _mapper.Map<AccountDTO>(accountEntity);
+
+            return CreatedAtRoute("AccountById", new { accountId = accountToReturn.AccountId }, accountToReturn);
+        }
+
         [HttpPost("collection")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateAccountCollection([FromBody] IEnumerable<AccountForCreationDTO> accountForCreationDTOs)
         {
-            if (accountForCreationDTOs == null)
-            {
-                _logger.LogError("Account collection sent from client is null.");
-                return BadRequest("Account collection is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the AccountForCreationDTO.");
-                return UnprocessableEntity(ModelState);
-            }
-
             var accounts = _mapper.Map<IEnumerable<Account>>(accountForCreationDTOs);
 
             foreach (var account in accounts)
@@ -128,43 +103,12 @@ namespace EventManager.Controllers
             return CreatedAtRoute("AccountCollection", new { accountIds }, accountDTOs);
         }
 
-        [HttpDelete("{accountId}")]
-        public async Task<IActionResult> DeleteAccount(Guid accountId)
-        {
-            var account = await _repository.Account.GetAccountAsync(accountId, trackChanges: false);
-            if (account == null)
-            {
-                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
-                return NotFound();
-            }
-
-            _repository.Account.DeleteAccount(account);
-            await _repository.SaveAsync();
-
-            return NoContent();
-        }
-
         [HttpPut("{accountId}")]
-        public async Task<IActionResult> UpdateAccount(Guid accountId, [FromBody]AccountForUpdateDTO account)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ServiceFilter(typeof(ValidateAccountExistsAttribute))]
+        public async Task<IActionResult> UpdateAccount(Guid accountId, [FromBody] AccountForUpdateDTO account)
         {
-            if(account == null)
-            {
-                _logger.LogError("Account object sent from client is null.");
-                return BadRequest("Account object is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the AccountForUpdateDTO.");
-                return UnprocessableEntity(ModelState);
-            }
-
-            var accountEntity = await _repository.Account.GetAccountAsync(accountId, true);
-            if(accountEntity == null)
-            {
-                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
-                return NotFound();
-            }
+            var accountEntity = HttpContext.Items["account"];
 
             _mapper.Map(account, accountEntity);
             await _repository.SaveAsync();
@@ -173,21 +117,17 @@ namespace EventManager.Controllers
         }
 
         [HttpPatch("{accountId}")]
-        public async Task<IActionResult> PartiallyUpdateAccount(Guid accountId, 
-            [FromBody]JsonPatchDocument<AccountForUpdateDTO> patchDocument)
+        [ServiceFilter(typeof(ValidateAccountExistsAttribute))]
+        public async Task<IActionResult> PartiallyUpdateAccount(Guid accountId,
+            [FromBody] JsonPatchDocument<AccountForUpdateDTO> patchDocument)
         {
-            if(patchDocument == null)
+            if (patchDocument == null)
             {
                 _logger.LogError($"Account patchDocument object sent from client is null.");
                 return BadRequest("PatchDocument is null");
             }
 
-            var account = await _repository.Account.GetAccountAsync(accountId, true);
-            if(account == null)
-            {
-                _logger.LogInfo($"Account with id: {accountId} doesn't exist in the databse.");
-                return NotFound();
-            }
+            var account = HttpContext.Items["account"];
 
             var accountToPatch = _mapper.Map<AccountForUpdateDTO>(account);
 
@@ -204,5 +144,16 @@ namespace EventManager.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{accountId}")]
+        [ServiceFilter(typeof(ValidateAccountExistsAttribute))]
+        public async Task<IActionResult> DeleteAccount(Guid accountId)
+        {
+            var account = HttpContext.Items["account"] as Account;
+
+            _repository.Account.DeleteAccount(account);
+            await _repository.SaveAsync();
+
+            return NoContent();
+        }
     }
 }

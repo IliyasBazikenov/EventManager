@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Entities.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -24,11 +25,13 @@ namespace Repository
 
         }
 
-        public async Task<IEnumerable<Event>> GetEventsAsync(Guid accountId, bool trackChanges)
+        public async Task<PagedList<Event>> GetEventsAsync(Guid accountId, EventParameters eventParameters, bool trackChanges)
         {
-            return await FindByCondition(e => e.AccountId.Equals(accountId), trackChanges)
+            var events = await FindByCondition(e => e.AccountId.Equals(accountId) && 
+            (e.DateOfEvent >= eventParameters.MinEventDate && e.DateOfEvent <= eventParameters.MaxEventDate ), trackChanges)
                 .OrderBy(e => e.EventId)
                 .ToListAsync();
+            return PagedList<Event>.ToPagedList(events, eventParameters.PageNumber, eventParameters.PageSize);
         }
 
         public void CreateEvent(Guid accountId, Event eventEntity)

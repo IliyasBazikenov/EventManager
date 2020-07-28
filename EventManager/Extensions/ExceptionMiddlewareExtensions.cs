@@ -14,6 +14,7 @@ namespace EventManager.Extensions
 {
     public static class ExceptionMiddlewareExtensions
     {
+        //Only for my education
         public static void ConfigureExceptionHandler(this IApplicationBuilder app, ILoggerManager logger)
         {
             app.UseExceptionHandler(appError =>
