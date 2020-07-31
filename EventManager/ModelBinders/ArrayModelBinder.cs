@@ -28,9 +28,9 @@ namespace EventManager.ModelBinders
                 return Task.CompletedTask;
             }
 
-            var genericType = bindingContext.ModelType
+            Type genericType = bindingContext.ModelType
                 .GetTypeInfo().GenericTypeArguments[0];
-            var converter = TypeDescriptor.GetConverter(genericType);
+            TypeConverter converter = TypeDescriptor.GetConverter(genericType);
 
             var objectArray = providedValue.Split(new[] { "," },StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => converter.ConvertFromString(x.Trim()))

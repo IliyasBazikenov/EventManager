@@ -32,7 +32,7 @@ namespace EventManager.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAccounts()
         {
-            var accounts = await _repository.Account.GetAllAccountsAsync(trackChanges: false);
+            IEnumerable<Account> accounts = await _repository.Account.GetAllAccountsAsync(trackChanges: false);
             var accountsDTO = _mapper.Map<IEnumerable<AccountDTO>>(accounts);
 
             return Ok(accountsDTO);
@@ -42,7 +42,7 @@ namespace EventManager.Controllers
         [ServiceFilter(typeof(ValidateAccountExistsAttribute))]
         public IActionResult GetAccount(Guid accountId)
         {
-            var account = HttpContext.Items["account"];
+            var account = HttpContext.Items["account"] as Account;
 
             var accountDTO = _mapper.Map<AccountDTO>(account);
             return Ok(accountDTO);
@@ -58,7 +58,7 @@ namespace EventManager.Controllers
                 return BadRequest("Parameter accountId is null");
             }
 
-            var accounts = await _repository.Account.GetByIdsAsync(accountIds, trackChanges: false);
+            IEnumerable<Account> accounts = await _repository.Account.GetByIdsAsync(accountIds, trackChanges: false);
 
             if (accountIds.Count() != accounts.Count())
             {
@@ -108,7 +108,7 @@ namespace EventManager.Controllers
         [ServiceFilter(typeof(ValidateAccountExistsAttribute))]
         public async Task<IActionResult> UpdateAccount(Guid accountId, [FromBody] AccountForUpdateDTO account)
         {
-            var accountEntity = HttpContext.Items["account"];
+            var accountEntity = HttpContext.Items["account"] as Account;
 
             _mapper.Map(account, accountEntity);
             await _repository.SaveAsync();
@@ -127,7 +127,7 @@ namespace EventManager.Controllers
                 return BadRequest("PatchDocument is null");
             }
 
-            var account = HttpContext.Items["account"];
+            var account = HttpContext.Items["account"] as Account;
 
             var accountToPatch = _mapper.Map<AccountForUpdateDTO>(account);
 

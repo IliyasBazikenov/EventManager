@@ -8,7 +8,6 @@ namespace Entities.RequestFeatures
     {
         const int maxPageSize = 50;
         public int PageNumber { get; set; } = 1;
-
         private int _pageSize = 10;
         public int PageSize
         {
@@ -16,5 +15,9 @@ namespace Entities.RequestFeatures
             set => _pageSize = (value > maxPageSize) ? maxPageSize : value;
 
         }
+
+        public string OrderBy { get; set; }
+        public string Fields { get; set; }
+        
     }
 }

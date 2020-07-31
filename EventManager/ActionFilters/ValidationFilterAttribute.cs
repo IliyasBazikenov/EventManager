@@ -19,10 +19,10 @@ namespace EventManager.ActionFilters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var action = context.RouteData.Values["action"];
-            var controller = context.RouteData.Values["controller"];
+            object action = context.RouteData.Values["action"];
+            object controller = context.RouteData.Values["controller"];
 
-            var param = context.ActionArguments.SingleOrDefault(d => d.Value.ToString().Contains("DTO")).Value;
+            object param = context.ActionArguments.SingleOrDefault(d => d.Value.ToString().Contains("DTO")).Value;
 
             if (param == null)
             {

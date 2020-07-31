@@ -34,7 +34,7 @@ namespace EventManager.Controllers
             if (eventParameters.ValidDateRange!)
                 return BadRequest("Max date can't be less than min age.");
 
-            var accountEvents = await _repository.Event.GetEventsAsync(accountId, eventParameters, trackChanges: false);
+            PagedList<Event> accountEvents = await _repository.Event.GetEventsAsync(accountId, eventParameters, trackChanges: false);
 
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(accountEvents.MetaData));
 

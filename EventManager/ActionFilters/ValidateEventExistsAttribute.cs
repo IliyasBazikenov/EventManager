@@ -19,7 +19,7 @@ namespace EventManager.ActionFilters
         }
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var method = context.HttpContext.Request.Method;
+            string method = context.HttpContext.Request.Method;
             var trackChanges = (method.Equals("PUT") || method.Equals("PATCH"));
 
             var accountId = (Guid)context.ActionArguments["accountId"];
