@@ -7,6 +7,7 @@ using Entities.DataTransferObjects;
 using Entities.Models;
 using Entities.RequestFeatures;
 using EventManager.ActionFilters;
+using EventManager.Utility;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -17,17 +18,21 @@ namespace EventManager.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private IRepositoryManager _repository;
-        private ILoggerManager _logger;
-        private IMapper _mapper;
-        public EventsController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+        private readonly IRepositoryManager _repository;
+        private readonly ILoggerManager _logger;
+        private readonly IMapper _mapper;
+        private readonly EventLinks _eventLinks;
+        public EventsController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper,
+            EventLinks eventLinks)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
+            _eventLinks = eventLinks;
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         [ServiceFilter(typeof(ValidateAccountExistsAttribute))]
         public async Task<IActionResult> GetEventsForAccount(Guid accountId, [FromQuery] EventParameters eventParameters)
         {
@@ -38,19 +43,22 @@ namespace EventManager.Controllers
 
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(accountEvents.MetaData));
 
-            var accountDTO = _mapper.Map<IEnumerable<EventDTO>>(accountEvents);
+            var eventsDTO = _mapper.Map<IEnumerable<EventDTO>>(accountEvents);
 
-            return Ok(accountDTO);
+            var links = _eventLinks.TryGenerateLinks(eventsDTO, 
+                eventParameters.Fields, accountId, HttpContext);
+
+            return links.HasLinks ? Ok(links.LinkedEntites) : Ok(links.ShapedEntities);
         }
 
         [HttpGet("{eventId}", Name = "GetEventForAccount")]
         [ServiceFilter(typeof(ValidateEventExistsAttribute))]
-        public IActionResult GetEventForAccount(Guid accountId, int eventId)
+        public IActionResult GetEventForAccount(Guid accountId, Guid eventId)
         {
             var accountEvent = HttpContext.Items["event"] as Event;
 
-            var accountDTO = _mapper.Map<EventDTO>(accountEvent);
-            return Ok(accountDTO);
+            var eventDTO = _mapper.Map<EventDTO>(accountEvent);
+            return Ok(eventDTO);
         }
 
         [HttpPost]
@@ -71,7 +79,7 @@ namespace EventManager.Controllers
         [HttpPut("{eventId}")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateEventExistsAttribute))]
-        public async Task<IActionResult> UpdateEventForAccount(Guid accountId, int eventId, [FromBody] EventForUpdateDTO eventDTO)
+        public async Task<IActionResult> UpdateEventForAccount(Guid accountId, Guid eventId, [FromBody] EventForUpdateDTO eventDTO)
         {
             var eventEntity = HttpContext.Items["event"] as Event;
 
@@ -83,7 +91,7 @@ namespace EventManager.Controllers
 
         [HttpPatch("{eventId}")]
         [ServiceFilter(typeof(ValidateEventExistsAttribute))]
-        public async Task<IActionResult> PartiallyUpdateEvent(Guid accountId, int eventId,
+        public async Task<IActionResult> PartiallyUpdateEvent(Guid accountId, Guid eventId,
             [FromBody] JsonPatchDocument<EventForUpdateDTO> patchDocument)
         {
             if (patchDocument == null)
@@ -112,7 +120,7 @@ namespace EventManager.Controllers
 
         [HttpDelete("{eventId}")]
         [ServiceFilter(typeof(ValidateEventExistsAttribute))]
-        public async Task<IActionResult> DeleteEvent(Guid accountId, int eventId)
+        public async Task<IActionResult> DeleteEvent(Guid accountId, Guid eventId)
         {
             var accountEvent = HttpContext.Items["event"] as Event;
 

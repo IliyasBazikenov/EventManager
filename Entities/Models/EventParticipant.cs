@@ -10,10 +10,10 @@ namespace Entities.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int EventParticipantId { get; set; }
+        public Guid EventParticipantId { get; set; }
 
         [ForeignKey(nameof(Event))]
-        public int EventId { get; set; }
+        public Guid EventId { get; set; }
         public Event Event { get; set; }
 
         [ForeignKey(nameof(Account))]

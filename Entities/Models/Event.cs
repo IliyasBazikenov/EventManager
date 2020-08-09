@@ -8,8 +8,7 @@ namespace Entities.Models
     public class Event
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int EventId { get; set; }
+        public Guid EventId { get; set; }
 
         [Required(ErrorMessage = "Created date is required")]
         [DataType(DataType.Date)]
@@ -22,7 +21,7 @@ namespace Entities.Models
         [Required(ErrorMessage = "Event date is required")]
         [DataType(DataType.Date)]
         public DateTime DateOfEvent { get; set; }
-        public string EventInfo { get; set; }
+        public string EventInfo { get; set; } 
         public int ParticipantAmount { get; set; }
 
         [ForeignKey(nameof(Account))]

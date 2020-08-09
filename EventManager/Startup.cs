@@ -2,8 +2,10 @@ using System;
 using System.IO;
 using AutoMapper;
 using Contracts;
+using Entities.DataTransferObjects;
 using EventManager.ActionFilters;
 using EventManager.Extensions;
+using EventManager.Utility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
+using Repository.DataShaping;
 
 namespace EventManager
 {
@@ -39,9 +42,12 @@ namespace EventManager
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
-            services.ConfigureActionFilter();
             services.AddAutoMapper(typeof(Startup));
             services.ConfigureContentNegotiations();
+            services.AddCustomMediaTypes();
+            services.ConfigureActionFilter();
+            services.AddScoped<EventLinks>();
+            services.AddScoped<IDataShaper<EventDTO>, DataShaper<EventDTO>>();
                     
         }
 

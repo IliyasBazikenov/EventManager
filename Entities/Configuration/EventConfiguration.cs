@@ -15,7 +15,7 @@ namespace Entities.Configuration
                 (
                    new Event
                    {
-                       EventId = 1,
+                       EventId= Guid.NewGuid(),
                        CreatedDate = DateTime.Now,
                        EventName = "Туса у децла",
                        ParticipantAmount = 0,

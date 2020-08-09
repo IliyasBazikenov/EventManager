@@ -32,7 +32,7 @@ namespace EventManager.ActionFilters
                 return;
             }
 
-            var eventId = (int)context.ActionArguments["eventId"];
+            var eventId = (Guid)context.ActionArguments["eventId"];
             var eventEntity = await _repository.Event.GetEventAsync(accountId, eventId, trackChanges);
 
             if(eventEntity == null)

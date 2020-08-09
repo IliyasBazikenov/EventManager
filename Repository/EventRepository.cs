@@ -19,7 +19,7 @@ namespace Repository
         {
         }
 
-        public async Task<Event> GetEventAsync(Guid accountId, int eventId, bool trackChanges)
+        public async Task<Event> GetEventAsync(Guid accountId, Guid eventId, bool trackChanges)
         {
             return await FindByCondition(e => e.AccountId.Equals(accountId) && e.EventId.Equals(eventId), trackChanges)
                 .SingleOrDefaultAsync();

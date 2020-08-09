@@ -9,7 +9,7 @@ namespace Entities.DataTransferObjects
     {
         [Required(ErrorMessage = "Created date is required")]
         [DataType(DataType.Date)]
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         [Required(ErrorMessage = "Event should have name")]
         [StringLength(100, ErrorMessage = "Event name length should be less than 100 characters", MinimumLength = 1)]
@@ -18,7 +18,7 @@ namespace Entities.DataTransferObjects
         [Required(ErrorMessage = "Event date is required")]
         [DataType(DataType.Date)]
         public DateTime DateOfEvent { get; set; }
-        public string EventInfo { get; set; }
-        public int ParticipantAmount { get; set; }
+        public string EventInfo { get; set; } = "";
+        public int ParticipantAmount { get; set; } = 0;
     }
 }

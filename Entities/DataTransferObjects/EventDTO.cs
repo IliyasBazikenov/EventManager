@@ -6,7 +6,7 @@ namespace Entities.DataTransferObjects
 {
     public class EventDTO
     {
-        public int EventId { get; set; }
+        public Guid EventId { get; set; }
         public DateTime CreatedDate { get; set; }
         public string EventName { get; set; }
         public DateTime DateOfEvent { get; set; }
