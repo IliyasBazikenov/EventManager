@@ -6,12 +6,15 @@ using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Entities.RequestFeatures;
 using EventManager.ActionFilters;
 using EventManager.ModelBinders;
+using EventManager.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
 
 namespace EventManager.Controllers
 {
@@ -22,20 +25,32 @@ namespace EventManager.Controllers
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
-        public AccountsController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+        private readonly AccountLinks _accountLinks;
+        public AccountsController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, 
+            AccountLinks accountLinks)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
+            _accountLinks = accountLinks;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAccounts()
+
+        [HttpGet(Name = "GetAccounts")]
+        [HttpHead]
+        [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
+        public async Task<IActionResult> GetAccounts([FromQuery] AccountParameters accountParameters)
         {
-            IEnumerable<Account> accounts = await _repository.Account.GetAllAccountsAsync(trackChanges: false);
+            PagedList<Account> accounts = await _repository.Account.GetAccountsAsync(accountParameters, trackChanges: false);
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(accounts.MetaData));
+
             var accountsDTO = _mapper.Map<IEnumerable<AccountDTO>>(accounts);
 
-            return Ok(accountsDTO);
+            var links = _accountLinks.TryGenerateLinks(accountsDTO,
+                accountParameters.Fields, HttpContext);
+
+            return links.HasLinks ? Ok(links.LinkedEntites) : Ok(links.ShapedEntities);
         }
 
         [HttpGet("{accountId}", Name = "AccountById")]
@@ -71,7 +86,7 @@ namespace EventManager.Controllers
             return Ok(accountsDTO);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateAccount")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateAccount([FromBody] AccountForCreationDTO account)
         {
@@ -154,6 +169,14 @@ namespace EventManager.Controllers
             await _repository.SaveAsync();
 
             return NoContent();
+        }
+
+        [HttpOptions]
+        public IActionResult GetAccountsOptions()
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, POST");
+
+            return Ok();
         }
     }
 }

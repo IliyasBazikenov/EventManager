@@ -46,8 +46,10 @@ namespace EventManager
             services.ConfigureContentNegotiations();
             services.AddCustomMediaTypes();
             services.ConfigureActionFilter();
+            services.AddScoped<AccountLinks>();
             services.AddScoped<EventLinks>();
             services.AddScoped<IDataShaper<EventDTO>, DataShaper<EventDTO>>();
+            services.AddScoped<IDataShaper<AccountDTO>, DataShaper<AccountDTO>>();
                     
         }
 

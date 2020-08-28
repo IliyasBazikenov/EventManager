@@ -18,7 +18,7 @@ namespace Entities.DataTransferObjects
         [Required(ErrorMessage = "Event date is required")]
         [DataType(DataType.Date)]
         public DateTime DateOfEvent { get; set; }
-        public string EventInfo { get; set; } = "";
-        public int ParticipantAmount { get; set; } = 0;
+        public string EventInfo { get; set; }
+        public int ParticipantAmount { get; set; }
     }
 }

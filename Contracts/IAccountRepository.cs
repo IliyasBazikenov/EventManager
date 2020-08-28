@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Contracts
 {
     public interface IAccountRepository
     {
-        Task<IEnumerable<Account>> GetAllAccountsAsync(bool trackChanges);
+        Task<PagedList<Account>> GetAccountsAsync(AccountParameters accountParameters, bool trackChanges);
         Task<Account> GetAccountAsync(Guid accountId, bool trackChanges);
         void CreateAccount(Account account);
         Task<IEnumerable<Account>> GetByIdsAsync(IEnumerable<Guid> accountIds, bool trackChanges);

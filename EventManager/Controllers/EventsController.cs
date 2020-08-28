@@ -32,6 +32,7 @@ namespace EventManager.Controllers
         }
 
         [HttpGet]
+        [HttpHead]
         [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         [ServiceFilter(typeof(ValidateAccountExistsAttribute))]
         public async Task<IActionResult> GetEventsForAccount(Guid accountId, [FromQuery] EventParameters eventParameters)
@@ -52,6 +53,7 @@ namespace EventManager.Controllers
         }
 
         [HttpGet("{eventId}", Name = "GetEventForAccount")]
+        [HttpHead]
         [ServiceFilter(typeof(ValidateEventExistsAttribute))]
         public IActionResult GetEventForAccount(Guid accountId, Guid eventId)
         {

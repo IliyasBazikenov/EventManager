@@ -86,8 +86,9 @@ namespace EventManager.Extensions
                 if (newtonsoftJsonOutputFormatter != null)
                 {
                     newtonsoftJsonOutputFormatter
-                    .SupportedMediaTypes
-                    .Add("application/vnd.iliyas.hateoas+json");
+                    .SupportedMediaTypes.Add("application/vnd.iliyas.hateoas+json");
+                    newtonsoftJsonOutputFormatter
+                    .SupportedMediaTypes.Add("application/vnd.iliyas.apiroot+json");
                 }
 
                 var xmlOutputFormatter = config.OutputFormatters
@@ -96,8 +97,9 @@ namespace EventManager.Extensions
                 if (xmlOutputFormatter != null)
                 {
                     xmlOutputFormatter
-                    .SupportedMediaTypes
-                    .Add("application/vnd.iliyas.hateoas+xml");
+                    .SupportedMediaTypes.Add("application/vnd.iliyas.hateoas+xml");
+                    xmlOutputFormatter
+                    .SupportedMediaTypes.Add("application/vnd.iliyas.apiroot+xml");
                 }
             });
         }

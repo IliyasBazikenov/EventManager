@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entiti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{9DF618FC-648A-4CAB-8A14-5235DB7DDC73}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventManager.Tests", "EventManager.Tests\EventManager.Tests.csproj", "{15E73A87-E56B-4267-818F-3C8504407E0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventManager.IntegrationTests", "EventManager.IntegrationTests\EventManager.IntegrationTests.csproj", "{922919DD-007B-425D-B426-4731300E05CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{9DF618FC-648A-4CAB-8A14-5235DB7DDC73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DF618FC-648A-4CAB-8A14-5235DB7DDC73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DF618FC-648A-4CAB-8A14-5235DB7DDC73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15E73A87-E56B-4267-818F-3C8504407E0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15E73A87-E56B-4267-818F-3C8504407E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15E73A87-E56B-4267-818F-3C8504407E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15E73A87-E56B-4267-818F-3C8504407E0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{922919DD-007B-425D-B426-4731300E05CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{922919DD-007B-425D-B426-4731300E05CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{922919DD-007B-425D-B426-4731300E05CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{922919DD-007B-425D-B426-4731300E05CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

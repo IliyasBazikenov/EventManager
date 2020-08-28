@@ -26,7 +26,7 @@ namespace EventManager.Utility
         public LinkResponse TryGenerateLinks(IEnumerable<EventDTO> eventDTOs,
             string fields, Guid accountId, HttpContext httpContext)
         {
-            var shapedEvents = ShapeData(eventDTOs, fields);
+            List<Entity> shapedEvents = ShapeData(eventDTOs, fields);
 
             if (ShouldGenerateLinks(httpContext))
                 return ReturnLinkedEvents(eventDTOs, fields, accountId, httpContext, shapedEvents);
@@ -42,16 +42,15 @@ namespace EventManager.Utility
         private LinkResponse ReturnLinkedEvents(IEnumerable<EventDTO> eventDTOs,
             string fields, Guid accountId, HttpContext httpContext, List<Entity> shapedEvents)
         {
-            var eventDtoList = eventDTOs.ToList();
-            for (int index = 0; index < eventDtoList.Count; index++)
+            var eventDTOsList = eventDTOs.ToList();
+            for (int index = 0; index < eventDTOsList.Count; index++)
             {
-                var eventLinks = CreateLinksForEvent(httpContext, accountId, eventDtoList[index].EventId, fields);
+                List<Link> eventLinks = CreateLinksForEvent(httpContext, accountId, eventDTOsList[index].EventId, fields);
                 shapedEvents[index].Add("Links", eventLinks);
             }
 
             var eventCollection = new LinkCollectionWrapper<Entity>(shapedEvents);
-
-            var linkedEvents = CreateLinksForEvent(httpContext, eventCollection);
+            LinkCollectionWrapper<Entity> linkedEvents = CreateLinksForEvent(httpContext, eventCollection);
 
             return new LinkResponse { HasLinks = true, LinkedEntites = linkedEvents };
         }
@@ -82,7 +81,7 @@ namespace EventManager.Utility
                 values: new { accountId, eventId }),
                 "update_event",
                 "PUT"),
-                new Link(_linkGenerator.GetUriByAction(httpContext, "PartiallyUpdateForEvent",
+                new Link(_linkGenerator.GetUriByAction(httpContext, "PartiallyUpdateEvent",
                 values: new { accountId, eventId }),
                 "partially_update_event",
                 "PATCH")

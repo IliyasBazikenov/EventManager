@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Entities.DataTransferObjects
 {
@@ -10,7 +11,9 @@ namespace Entities.DataTransferObjects
         public DateTime CreatedDate { get; set; }
         public string EventName { get; set; }
         public DateTime DateOfEvent { get; set; }
-        public string EventInfo { get; set; }
+
+        [XmlElement(IsNullable = true)]
+        public string EventInfo { get; set; } = "";
         public int ParticipantAmount { get; set; }
     }
 }

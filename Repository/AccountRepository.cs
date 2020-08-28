@@ -1,7 +1,9 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Entities.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +19,14 @@ namespace Repository
         {
         }
 
-        public async Task<IEnumerable<Account>> GetAllAccountsAsync(bool trackChanges)
+        public async Task<PagedList<Account>> GetAccountsAsync(AccountParameters accountParameters, bool trackChanges)
         {
-            return await FindAll(trackChanges)
-                .OrderBy(a => a.FirstName)
+            var accounts = await FindAll(trackChanges)
+                .Search(accountParameters.SearchTerm)
+                .Sort(accountParameters.OrderBy)
                 .ToListAsync();
+
+            return PagedList<Account>.ToPagedList(accounts, accountParameters.PageNumber, accountParameters.PageSize); 
         }
 
         public async Task<Account> GetAccountAsync(Guid accountId, bool trackChanges)

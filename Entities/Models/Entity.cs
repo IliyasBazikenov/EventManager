@@ -83,7 +83,11 @@ namespace Entities.Models
         {
             writer.WriteStartElement(key);
 
-            if (value.GetType() == typeof(List<Link>))
+            if (value == null)
+            {
+                writer.WriteString(string.Empty);
+            }
+            else if (value.GetType() == typeof(List<Link>))
             {
                 foreach (var link in value as List<Link>)
                 {
