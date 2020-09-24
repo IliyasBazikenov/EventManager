@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using AspNetCoreRateLimit;
 using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
@@ -38,32 +39,59 @@ namespace EventManager
             services.ConfigureLoggerService();
             services.ConfigureMySqlContext(Configuration);
             services.ConfigureRepositoryManager();
+            services.AddAutoMapper(typeof(Startup));
+            services.ConfigureActionFilters();
+
+            services.AddScoped<AccountLinks>();
+            services.AddScoped<EventLinks>();
+
+            services.AddScoped<IDataShaper<EventDTO>, DataShaper<EventDTO>>();
+            services.AddScoped<IDataShaper<AccountDTO>, DataShaper<AccountDTO>>();
+
+            services.ConfigureVersioning();
+
+            services.ConfigureResponseCaching();
+            services.ConfigureHttpCacheHeaders();
+
+            services.AddMemoryCache();
+
+            services.ConfigureRateLimitingOptions(Configuration);
+            services.AddHttpContextAccessor();
+
+            services.AddAuthentication();
+            services.ConfigureIdentity();
+
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
-            services.AddAutoMapper(typeof(Startup));
-            services.ConfigureContentNegotiations();
+
+            services.AddControllers(config =>
+            {
+                config.RespectBrowserAcceptHeader = true;
+                config.ReturnHttpNotAcceptable = true;
+                config.CacheProfiles.Add("60SecondsDuration", new CacheProfile { Duration = 60 });
+            }).AddNewtonsoftJson()
+            .AddXmlDataContractSerializerFormatters()
+            .AddCustomCSVFormatter();
+
             services.AddCustomMediaTypes();
-            services.ConfigureActionFilter();
-            services.AddScoped<AccountLinks>();
-            services.AddScoped<EventLinks>();
-            services.AddScoped<IDataShaper<EventDTO>, DataShaper<EventDTO>>();
-            services.AddScoped<IDataShaper<AccountDTO>, DataShaper<AccountDTO>>();
-                    
+            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerManager logger)
         {
-            
+            app.UseIpRateLimiting();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             
             app.ConfigureCustomExceptionMiddleware();
-
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseCors("CORS Policy");
@@ -73,10 +101,12 @@ namespace EventManager
                 ForwardedHeaders = ForwardedHeaders.All
             });
 
-            app.UseHttpsRedirection();
+            app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

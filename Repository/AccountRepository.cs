@@ -31,7 +31,7 @@ namespace Repository
 
         public async Task<Account> GetAccountAsync(Guid accountId, bool trackChanges)
         {
-            return await FindByCondition(a => a.AccountId.Equals(accountId), trackChanges)
+            return await FindByCondition(a => a.Id.Equals(accountId), trackChanges)
                 .SingleOrDefaultAsync();
         }
 
@@ -42,7 +42,7 @@ namespace Repository
 
         public async Task<IEnumerable<Account>> GetByIdsAsync(IEnumerable<Guid> accountIds, bool trackChanges)
         {
-            return await FindByCondition(a => accountIds.Contains(a.AccountId), trackChanges)
+            return await FindByCondition(a => accountIds.Contains(a.Id), trackChanges)
                 .ToListAsync();
         }
 

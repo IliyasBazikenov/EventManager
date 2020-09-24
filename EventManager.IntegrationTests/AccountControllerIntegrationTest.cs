@@ -32,7 +32,7 @@ namespace EventManager.IntegrationTests
             var result = JsonConvert.DeserializeObject<List<Entity>>(responseString);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal(3, result.Count);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace EventManager.IntegrationTests
             var result = JsonConvert.DeserializeObject<LinkCollectionWrapper<Entity>>(responseString);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal(3, result.Value.Count);
+            Assert.Empty(result.Value);
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace EventManager.IntegrationTests
             var result = JsonConvert.DeserializeObject<LinkCollectionWrapper<Entity>>(responseString);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal(3, result.Value.Count);
+            Assert.Empty(result.Value);
         }
     }
 }

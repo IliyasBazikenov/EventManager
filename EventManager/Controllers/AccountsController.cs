@@ -10,6 +10,7 @@ using Entities.RequestFeatures;
 using EventManager.ActionFilters;
 using EventManager.ModelBinders;
 using EventManager.Utility;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -54,6 +55,7 @@ namespace EventManager.Controllers
         }
 
         [HttpGet("{accountId}", Name = "AccountById")]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 45)]
         [ServiceFilter(typeof(ValidateAccountExistsAttribute))]
         public IActionResult GetAccount(Guid accountId)
         {

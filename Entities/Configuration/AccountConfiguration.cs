@@ -11,9 +11,9 @@ namespace Entities.Configuration
     {
         public void Configure(EntityTypeBuilder<Account> builder)
         {
+            /*
             builder.HasIndex(a => a.Email)
                 .IsUnique();
-
             builder.HasData
                 (
                     new Account
@@ -42,6 +42,7 @@ namespace Entities.Configuration
                         PhoneNumber = "+79999999998"
                     }
                 );
+            */
         }
     }
 }

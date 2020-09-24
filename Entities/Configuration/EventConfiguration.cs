@@ -11,6 +11,7 @@ namespace Entities.Configuration
     {
         public void Configure(EntityTypeBuilder<Event> builder)
         {
+            /*
             builder.HasData
                 (
                    new Event
@@ -23,6 +24,7 @@ namespace Entities.Configuration
                        DateOfEvent = DateTime.Parse("21-07-2020"),
                    }
                 );
+            */
         }
     }
 }

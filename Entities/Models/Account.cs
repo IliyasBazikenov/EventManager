@@ -1,26 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entities.Models
 {
-    public class Account
+    [Table("Account")]
+    public class Account : IdentityUser<Guid>
     {
-        [Key]
-        public Guid AccountId { get; set; }
-        
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
-        public string Email { get; set; }
-
-        [Required(ErrorMessage = "Password is required")]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        [Required(ErrorMessage = "Phone number is required")]
-        [Phone(ErrorMessage = "Invalid phone number")]
-        public string PhoneNumber { get; set; }
-
         [Required(ErrorMessage = "Created date is required")]
         [DataType(DataType.Date)]
         public DateTime CreatedDate { get; set; }
