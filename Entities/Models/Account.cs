@@ -32,12 +32,7 @@ namespace Entities.Models
 
         [MaxLength(150, ErrorMessage = "Address length must be  less than 150 characters")]
         public string Address { get; set; }
-
         public int FriendsAmount { get; set; }
-
-        // AccountType can be admin, moderator or default user.  
-        [Required(ErrorMessage = "Account type is required")]
-        public string AccountType { get; set; }
 
         public ICollection<Event> Events { get; set; }
         public ICollection<EventParticipant> EventParticipants { get; set; }

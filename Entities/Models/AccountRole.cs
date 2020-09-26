@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Entities.Models
 {
-    public class Role : IdentityRole<Guid>
+    public class AccountRole : IdentityRole<Guid>
     {
     }
 }
